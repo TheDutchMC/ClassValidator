@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven'
+	id 'signing'
+}
+
+group = 'dev.array21'
+version = '1.0.0'
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
+      }
+
+      snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'ClassValidator'
+        artifactId = 'classvalidator'
+        packaging 'jar'
+        description 'Class Validation library'
+        url 'https://github.com/TheDutchMC/ClassValidator'
+	
+		scm {
+			connection 'scm:git:git://github.com/TheDutchMC/ClassValidator.git'
+			developerConnection 'scm:git:ssh://github.com:TheDutchMC/ClassValidator.git'
+			url 'https://github.com/TheDutchMC/ClassValidator/tree/master'
+		}
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+
+        developers {
+          developer {
+            id 'tobiasdebruijn'
+            name 'Tobias de Bruijn'
+            email 't.debruijn@array21.dev'
+          }
+        }
+      }
+    }
+  }
+}
