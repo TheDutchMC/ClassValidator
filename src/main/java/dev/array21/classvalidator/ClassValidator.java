@@ -40,11 +40,12 @@ public class ClassValidator {
 		
 		List<Class<?>> internalClasses = Arrays.asList(input.getClass().getDeclaredClasses());
 		for(Field f : fields) {
+
 			if(f.isAnnotationPresent(Required.class)) {
 				try {
 					f.setAccessible(true);
 					if(f.get(input) == null) {
-						return new Pair<Boolean, String>(false, "Missing required field: " + f.getName());
+						return new Pair<>(false, "Missing required field: " + f.getName());
 					}
 					
 					if(f.getType().isArray() && (internalClasses.contains(f.getType().getComponentType()) || f.isAnnotationPresent(External.class))) {
@@ -60,7 +61,7 @@ public class ClassValidator {
 								} else {
 									List<String> reason = Arrays.asList(innerValidation.getB().split(Pattern.quote(" ")));
 									
-									return new Pair<Boolean, String>(false, String.format("%s %s.%d.%s", String.join(" ", reason.subList(0, reason.size() -1)), f.getName(), j, reason.get(reason.size() -1)));
+									return new Pair<>(false, String.format("%s %s.%d.%s", String.join(" ", reason.subList(0, reason.size() -1)), f.getName(), j, reason.get(reason.size() -1)));
 								}
 							}
 						}
@@ -87,5 +88,9 @@ public class ClassValidator {
 		}
 
 		return new Pair<Boolean, String>(true, null);
+	}
+
+	private Pair<Boolean, String> validateArray(Object[] array) {
+		throw new RuntimeException();
 	}
 }
